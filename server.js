@@ -17,11 +17,26 @@ app.get('/', (request, response) => {
   response.send('You are in the root directory.');
 });
 
+// Global variables for .find()
 app.get('/weatherData', (req, res) => {
-  const type = req.query.type || 'city_name';
+  const cityName = req.query.city || 'city_name';
+  const cityLat = req.query.lat || 'lat';
+  const cityLon = req.query.lon || 'lon';
   console.log('Query Params: ', req.query);
-  console.log('Type: ', type);
-  res.status(200).send(weatherData[type]);
+  console.log('City: ', cityName, 'Latitude ', cityLat, 'Longitude ', cityLon);
+  const foundCity = weatherData.find(cityObj => {
+    return (cityObj.lat===cityLat) && (cityObj.lon===cityLon) && (cityName.toUpperCase().includes(cityObj.city_name.toUpperCase()));
+  })
+  // console.log(foundCity);
+
+  if (foundCity === undefined){
+    res.status(404).send('City not found!');
+  } else {
+    console.log(foundCity);
+  }
+  res.send(weatherData[0].data);
 });
+
+// Collect 3 variables (lat, lon, searchQuery) from front end via form submission
 
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
