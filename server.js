@@ -19,13 +19,13 @@ app.get('/', (request, response) => {
 
 // Global variables for .find()
 app.get('/weatherData', (req, res) => {
-  const cityName = req.query.city || 'city_name';
-  const cityLat = req.query.lat || 'lat';
-  const cityLon = req.query.lon || 'lon';
+  const cityName = req.query.city || 'Seattle';
+  const cityLat = req.query.lat || '47.60621';
+  const cityLon = req.query.lon || '-122.33207';
   console.log('Query Params: ', req.query);
   console.log('City: ', cityName, 'Latitude ', cityLat, 'Longitude ', cityLon);
   const foundCity = weatherData.find(cityObj => {
-    return (parseInt(cityObj.lat)===parseInt(cityLat)) && (parseInt(cityObj.lon)===parseInt(cityLon)) && (cityName.toUpperCase().includes(cityObj.city_name.toUpperCase()));
+    return (Math.round(parseInt(cityObj.lat))===Math.round(parseInt(cityLat))) && (Math.round(parseInt(cityObj.lon))===Math.round(parseInt(cityLon))) && (cityName.toUpperCase().includes(cityObj.city_name.toUpperCase()));
   });
   // console.log(foundCity);
 
