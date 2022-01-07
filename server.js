@@ -25,17 +25,38 @@ app.get('/weatherData', (req, res) => {
   console.log('Query Params: ', req.query);
   console.log('City: ', cityName, 'Latitude ', cityLat, 'Longitude ', cityLon);
   const foundCity = weatherData.find(cityObj => {
-    return (cityObj.lat===cityLat) && (cityObj.lon===cityLon) && (cityName.toUpperCase().includes(cityObj.city_name.toUpperCase()));
-  })
+    return (parseInt(cityObj.lat)===parseInt(cityLat)) && (parseInt(cityObj.lon)===parseInt(cityLon)) && (cityName.toUpperCase().includes(cityObj.city_name.toUpperCase()));
+  });
   // console.log(foundCity);
 
   if (foundCity === undefined){
     res.status(404).send('City not found!');
   } else {
-    console.log(foundCity);
+    const responseArray = parseWeatherData(foundCity);
+    // console.log(foundCity);
+    console.log(responseArray);
+    res.status(200).send(responseArray);
   }
-  res.send(weatherData[0].data);
+  // res.send(weatherData[0].data);
 });
+
+const parseWeatherData = foundCity => {
+  let responseArray = [];
+  foundCity.data.forEach(day => {
+    let description = `Low of ${day.low_temp}, high of ${day.high_temp} with ${day.weather.description}`;
+    let date = day.valid_date;
+    let response = new Forecast(description, date);
+    responseArray.push(response);
+  });
+  return responseArray;
+};
+
+class Forecast {
+  constructor(description, date){
+    this.description = description;
+    this.date = date;
+  }
+}
 
 // Collect 3 variables (lat, lon, searchQuery) from front end via form submission
 
