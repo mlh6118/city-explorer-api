@@ -5,7 +5,8 @@ const express = require('express');
 require('dotenv').config();
 // cors gives permission to access server.
 const cors = require('cors');
-const weatherData = require('./data/weather.json');
+// const weatherData = require('./data/weather.json');
+const axios = require('axios');
 
 const app = express();
 app.use(cors());
@@ -17,27 +18,26 @@ app.get('/', (request, response) => {
   response.send('You are in the root directory.');
 });
 
-// Global variables for .find()
+// WEATHER FORECAST API/Forecast Class
 app.get('/weatherData', (req, res) => {
   const cityName = req.query.city || 'Seattle';
   const cityLat = req.query.lat || '47.60621';
   const cityLon = req.query.lon || '-122.33207';
-  console.log('Query Params: ', req.query);
-  console.log('City: ', cityName, 'Latitude ', cityLat, 'Longitude ', cityLon);
-  const foundCity = weatherData.find(cityObj => {
-    return (Math.round(parseInt(cityObj.lat))===Math.round(parseInt(cityLat))) && (Math.round(parseInt(cityObj.lon))===Math.round(parseInt(cityLon))) && (cityName.toUpperCase().includes(cityObj.city_name.toUpperCase()));
-  });
-  // console.log(foundCity);
 
-  if (foundCity === undefined){
-    res.status(404).send('City not found!');
-  } else {
-    const responseArray = parseWeatherData(foundCity);
-    // console.log(foundCity);
-    console.log(responseArray);
-    res.status(200).send(responseArray);
+  const weatherAPI = async () => {
+    const url = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${cityLat}&lon=${cityLon}&key=${process.env.WEATHER_API_KEY}`
+
+    const response = await axios.get(url);
+    if (response.data === undefined) {
+      res.status(500).send('City not found!');
+    } else {
+      const responseArray = parseWeatherData(response.data);
+      res.status(200).send(responseArray);
+    }
   }
-  // res.send(weatherData[0].data);
+
+  weatherAPI();
+
 });
 
 const parseWeatherData = foundCity => {
@@ -52,12 +52,46 @@ const parseWeatherData = foundCity => {
 };
 
 class Forecast {
-  constructor(description, date){
+  constructor(description, date) {
     this.description = description;
     this.date = date;
   }
 }
 
-// Collect 3 variables (lat, lon, searchQuery) from front end via form submission
+app.get('/movies', (req, res) => {
+  const cityName = req.query.city || 'Seattle';
+
+  const movieAPI = async () => {
+    const url = `https://api.themoviedb.org/3/movie/550?api_key=${process.env.MOVIE_API_KEY}&query=${cityName}`
+
+    const response = await axios.get(url);
+    if (response.data === undefined) {
+      res.status(500).send('City not found!');
+    } else {
+      const responseArray = parseMovieData(response.data);
+      res.status(200).send(responseArray);
+    }
+    console.log(response.data);
+  }
+
+  movieAPI();
+
+});
+
+const parseMovieData = foundMovies => {
+  let movieArray = [];
+  foundMovies.data.forEach(movie => {
+    let description = `Low of ${movie.original_title}`
+    let responseMovie = new Movies(description);
+    movieArray.push(responseMovie);
+  });
+  return responseArray;
+};
+
+class Movies {
+  constructor(description) {
+    this.description = description;
+  }
+}
 
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
