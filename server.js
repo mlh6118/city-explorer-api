@@ -58,7 +58,7 @@ class Forecast {
 }
 
 app.get('/movies', (req, res) => {
-  const cityName = req.query || 'Seattle';
+  const cityName = req.query.city || 'Seattle';
 
   const movieAPI = async () => {
     const url = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${cityName}`;
