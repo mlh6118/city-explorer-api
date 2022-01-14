@@ -7,10 +7,10 @@ const axios = require('axios');
 let weatherModule = (req, res) => {
   const cityLat = req.query.lat || '47.60621';
   const cityLon = req.query.lon || '-122.33207';
-
+  
   const weatherAPI = async () => {
-    const url = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${cityLat}&lon=${cityLon}&key=${process.env.WEATHER_API_KEY}`;
-
+    const url = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${cityLat}&lon=${cityLon}&units=I&days=5&key=${process.env.WEATHER_API_KEY}`;
+    console.log(url);
     const response = await axios.get(url);
     if (response.data === undefined) {
       res.status(500).send('City not found!');
