@@ -1,24 +1,25 @@
-'use strict'
+'use strict';
 
 const axios = require('axios');
-
 const cache = require('./cache.js');
 
 // WEATHER FORECAST API/Forecast Class
 let weatherModule = (req, res) => {
   const cityLat = req.query.lat || '47.60621';
   const cityLon = req.query.lon || '-122.33207';
+  //Data becomes stale after 1 hour
+  const dataStale = 60*60*1000;
 
   const weatherAPI = async () => {
     const key = `weather-${cityLat}${cityLon}`;
     const url = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${cityLat}&lon=${cityLon}&units=I&days=5&key=${process.env.WEATHER_API_KEY}`;
 
-    if(cache[key] && (Date.now() - cache[key].timestamp < 50000)){
-      console.log('Cache HIT');
-      console.log(cache[key].data);
+    if(cache[key] && (Date.now() - cache[key].timestamp < dataStale)){
+      console.log('Cache hit: Weather data');
+      //console.log(cache[key].data);
       res.status(200).send(cache[key].data);
     } else {
-      console.log('Cache MISS');
+      console.log('Cache miss: Weather data');
       cache[key] = {};
       cache[key].timestamp = Date.now();
 
@@ -35,7 +36,7 @@ let weatherModule = (req, res) => {
 
   weatherAPI();
 
-  console.log(cache);
+  // console.log(cache);
 };
 
 const parseWeatherData = foundCity => {
